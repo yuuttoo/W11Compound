@@ -7,6 +7,8 @@ import "./ErrorReporter.sol";
 import "./EIP20Interface.sol";
 import "./InterestRateModel.sol";
 import "./ExponentialNoError.sol";
+import "hardhat/console.sol";
+
 
 /**
  * @title Compound's CToken Contract
@@ -335,7 +337,9 @@ abstract contract CToken is CTokenInterface, ExponentialNoError, TokenErrorRepor
         }
 
         /* Read the previous values out of storage */
+        //console.log("cashPrior at Ctoken: 1");
         uint cashPrior = getCashPrior();
+        //console.log("cashPrior at Ctoken: 2");
         uint borrowsPrior = totalBorrows;
         uint reservesPrior = totalReserves;
         uint borrowIndexPrior = borrowIndex;

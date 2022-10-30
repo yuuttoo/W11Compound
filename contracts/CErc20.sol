@@ -2,6 +2,8 @@
 pragma solidity ^0.8.10;
 
 import "./CToken.sol";
+import "hardhat/console.sol";
+
 
 interface CompLike {
     function delegate(address delegatee) external;
@@ -38,8 +40,8 @@ contract CErc20 is CToken, CErc20Interface {
         
        
         // Set underlying and sanity check it
-        // underlying = underlying_;
-        // EIP20Interface(underlying).totalSupply();
+        underlying = underlying_;
+        EIP20Interface(underlying).totalSupply();
     }
 
     /*** User Interface ***/
@@ -52,6 +54,10 @@ contract CErc20 is CToken, CErc20Interface {
      */
     function mint(uint mintAmount) override external returns (uint) {
         mintInternal(mintAmount);
+        console.log(
+            "mintAmount:",
+            mintAmount
+        );
         return NO_ERROR;
     }
 
@@ -150,6 +156,9 @@ contract CErc20 is CToken, CErc20Interface {
      */
     function getCashPrior() virtual override internal view returns (uint) {
         EIP20Interface token = EIP20Interface(underlying);
+        // console.log("getCashPrior at CErc20: 1");
+        // console.log(underlying);    
+
         return token.balanceOf(address(this));
     }
 
