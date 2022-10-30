@@ -80,7 +80,7 @@ describe("CERC20", function() {
       console.log("approved user1 to interact with cErc20");
 
       //transfer 100 erc20token to user1
-      await erc20.connect(owner).transfer(user1.address, ethers.utils.parseUnits("100",18));
+      await erc20.transfer(user1.address, ethers.utils.parseUnits("100",18));
       let user1Mtkamout = ethers.utils.formatEther(await erc20.balanceOf(user1.address));
       console.log(`transfered ${user1Mtkamout} MTK to user1`);
 
@@ -88,9 +88,7 @@ describe("CERC20", function() {
       //開始mint 
       //碰到Transaction reverted: function returned an unexpected amount of data
       await cErc20.connect(user1).mint(ethers.utils.parseUnits("100",18));
-       //await cErc20.connect(user1).mint(ethers.utils.parseUnits("100", 18));
-       //await cErc20.connect(user1).redeem(ethers.utils.parseUnits("100", 18));
-        console.log("user1 minted 100 CTK with 100 MTK!!");
+      console.log("user1 minted 100 CTK with 100 MTK!!");
 
       //redeem
       await cErc20.connect(user1).redeem(ethers.utils.parseUnits("100",18));
