@@ -79,7 +79,7 @@ describe("CERC20 contract", function() {
         );
       
         //設定priceOracle
-        comptroller._setPriceOracle(priceOracle);
+        comptroller._setPriceOracle(priceOracle.address);
 
         await comptroller.connect(owner)._supportMarket(cTKA.address);
         console.log ("cTKA added to comptroller market list");
@@ -111,7 +111,7 @@ describe("CERC20 contract", function() {
 
         //設定TokenB collateral factor 為 50%
         //newCollateralFactorMantissa The new collateral factor, scaled by 1e18
-        comptroller.connect(owner)._setCollateralFactor(cTKB.address, ethers.utils.parseUnits("0.5", 18));
+        await comptroller.connect(owner)._setCollateralFactor(cTKB.address, ethers.utils.parseUnits("0.5", 18));
         console.log(`Set TokenB collateral factor to 50%`);
 
         //預存 100顆 tokenA到CTKA  ok

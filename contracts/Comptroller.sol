@@ -341,20 +341,20 @@ contract Comptroller is ComptrollerV7Storage, ComptrollerInterface, ComptrollerE
      */
     function borrowAllowed(address cToken, address borrower, uint borrowAmount) override external returns (uint) {
         // Pausing is a very serious situation - we revert to sound the alarms
-        console.log(cToken, borrower, borrowAmount,"SSSSS");
+        //console.log(cToken, borrower, borrowAmount,"SSSSS");
 
         require(!borrowGuardianPaused[cToken], "borrow is paused");
-        console.log(cToken, borrower, borrowAmount,"PPPPP");
+        //console.log(cToken, borrower, borrowAmount,"PPPPP");
 
 
         if (!markets[cToken].isListed) {
             return uint(Error.MARKET_NOT_LISTED);
         }
-        console.log(cToken, borrower, borrowAmount,"DDDDDD");
+        //console.log(cToken, borrower, borrowAmount,"DDDDDD");
 
         if (!markets[cToken].accountMembership[borrower]) {
             // only cTokens may call borrowAllowed if borrower not in market
-            console.log(cToken, borrower, borrowAmount,"RRRRR");
+            //console.log(cToken, borrower, borrowAmount,"RRRRR");
             require(msg.sender == cToken, "sender must be cToken");
     
 
@@ -363,7 +363,7 @@ contract Comptroller is ComptrollerV7Storage, ComptrollerInterface, ComptrollerE
             if (err != Error.NO_ERROR) {
                 return uint(err);
             }
-        console.log(cToken, borrower, borrowAmount,"QQQQQ");
+        //console.log(cToken, borrower, borrowAmount,"QQQQQ");
 
             // it should be impossible to break the important invariant
             assert(markets[cToken].accountMembership[borrower]);
@@ -876,35 +876,45 @@ contract Comptroller is ComptrollerV7Storage, ComptrollerInterface, ComptrollerE
       */
     function _setCollateralFactor(CToken cToken, uint newCollateralFactorMantissa) external returns (uint) {
         // Check caller is admin
+        //console.log(msg.sender ,"PPPPPPPPPP");
         if (msg.sender != admin) {
             return fail(Error.UNAUTHORIZED, FailureInfo.SET_COLLATERAL_FACTOR_OWNER_CHECK);
         }
-
+        //console.log(msg.sender ,"CCCCCCC");
         // Verify market is listed
         Market storage market = markets[address(cToken)];
         if (!market.isListed) {
             return fail(Error.MARKET_NOT_LISTED, FailureInfo.SET_COLLATERAL_FACTOR_NO_EXISTS);
         }
+        //console.log(msg.sender ,"DDDDDDD");
 
         Exp memory newCollateralFactorExp = Exp({mantissa: newCollateralFactorMantissa});
+        //console.log(msg.sender ,"VCVVVVV");
 
         // Check collateral factor <= 0.9
         Exp memory highLimit = Exp({mantissa: collateralFactorMaxMantissa});
         if (lessThanExp(highLimit, newCollateralFactorExp)) {
             return fail(Error.INVALID_COLLATERAL_FACTOR, FailureInfo.SET_COLLATERAL_FACTOR_VALIDATION);
         }
+        //console.log(msg.sender ,"XXXXXX");
+
+        //console.log(newCollateralFactorMantissa ,"XXXXXX");
+        //console.log(oracle.getUnderlyingPrice(cToken) ,"XXXXXX");
 
         // If collateral factor != 0, fail if price == 0
         if (newCollateralFactorMantissa != 0 && oracle.getUnderlyingPrice(cToken) == 0) {
             return fail(Error.PRICE_ERROR, FailureInfo.SET_COLLATERAL_FACTOR_WITHOUT_PRICE);
         }
+        //console.log(msg.sender ,"ZZZZZZZ");
 
         // Set market's collateral factor to new collateral factor, remember old value
         uint oldCollateralFactorMantissa = market.collateralFactorMantissa;
         market.collateralFactorMantissa = newCollateralFactorMantissa;
+                //console.log(msg.sender ,"TTTTTT");
 
         // Emit event with asset, old collateral factor, and new collateral factor
         emit NewCollateralFactor(cToken, oldCollateralFactorMantissa, newCollateralFactorMantissa);
+        console.log(msg.sender ,"JJJJJJJ");
 
         return uint(Error.NO_ERROR);
     }
