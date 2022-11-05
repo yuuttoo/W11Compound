@@ -8,6 +8,8 @@ import "./ComptrollerInterface.sol";
 import "./ComptrollerStorage.sol";
 import "./Unitroller.sol";
 import "./Governance/Comp.sol";
+import "hardhat/console.sol";
+
 
 
 /**
@@ -125,7 +127,6 @@ contract Comptroller is ComptrollerV7Storage, ComptrollerInterface, ComptrollerE
         uint[] memory results = new uint[](len);
         for (uint i = 0; i < len; i++) {
             CToken cToken = CToken(cTokens[i]);
-
             results[i] = uint(addToMarketInternal(cToken, msg.sender));
         }
 
