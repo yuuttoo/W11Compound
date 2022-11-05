@@ -341,21 +341,29 @@ contract Comptroller is ComptrollerV7Storage, ComptrollerInterface, ComptrollerE
      */
     function borrowAllowed(address cToken, address borrower, uint borrowAmount) override external returns (uint) {
         // Pausing is a very serious situation - we revert to sound the alarms
+        console.log(cToken, borrower, borrowAmount,"SSSSS");
+
         require(!borrowGuardianPaused[cToken], "borrow is paused");
+        console.log(cToken, borrower, borrowAmount,"PPPPP");
+
 
         if (!markets[cToken].isListed) {
             return uint(Error.MARKET_NOT_LISTED);
         }
+        console.log(cToken, borrower, borrowAmount,"DDDDDD");
 
         if (!markets[cToken].accountMembership[borrower]) {
             // only cTokens may call borrowAllowed if borrower not in market
+            console.log(cToken, borrower, borrowAmount,"RRRRR");
             require(msg.sender == cToken, "sender must be cToken");
+    
 
             // attempt to add borrower to the market
             Error err = addToMarketInternal(CToken(msg.sender), borrower);
             if (err != Error.NO_ERROR) {
                 return uint(err);
             }
+        console.log(cToken, borrower, borrowAmount,"QQQQQ");
 
             // it should be impossible to break the important invariant
             assert(markets[cToken].accountMembership[borrower]);

@@ -101,16 +101,24 @@ describe("CERC20 contract", function() {
         let formattingTKBPrice = ethers.utils.formatEther(tokenBPrice);
         console.log(`tokenB price: ${formattingTKBPrice}`);
 
-        //user1將tokenB加入抵押
-        await comptroller.connect(user1).enterMarkets([cTKB.address]);//address in []
-        console.log(`tokenB entered Markets: ${cTKB.address}`);
+
+        //將CTKB, CTKA加入抵押
+        await comptroller.connect(user1).enterMarkets([cTKA.address, cTKB.address]);//address in []
+        console.log(`cTKA, cTKB entered Markets`);
         let user1Assets = await comptroller.connect(user1).getAssetsIn(user1.address);
         console.log(`user1 getAssetsIn: ${user1Assets}`);
+
 
         //設定TokenB collateral factor 為 50%
         //newCollateralFactorMantissa The new collateral factor, scaled by 1e18
         comptroller.connect(owner)._setCollateralFactor(cTKB.address, ethers.utils.parseUnits("0.5", 18));
         console.log(`Set TokenB collateral factor to 50%`);
+
+        //預存 100顆 tokenA到CTKA  ok
+        await tokenA.connect(owner).approve(cTKA.address, ethers.utils.parseUnits("100", 18));
+        await cTKA.connect(owner).mint(ethers.utils.parseUnits("100", 18));
+        let TKAOfCTKA = ethers.utils.formatEther(await tokenA.balanceOf(cTKA.address));
+        console.log(`TKA in CTKA Amount:  ${TKAOfCTKA}`);             
     
 
         return { owner, user1, user2, tokenA, tokenB, cTKA, cTKB, comptroller };
@@ -197,41 +205,30 @@ describe("CERC20 contract", function() {
         //approve user1
         await tokenB.connect(user1).approve(cTKB.address, ethers.utils.parseUnits("100",18));
 
-        //send 100 tokenB to user1
+
+        //send 100 tokenB to user1  ok
         await tokenB.transfer(user1.address, ethers.utils.parseUnits("100", 18));
         let user1tokenBAmountBeforeMint = ethers.utils.formatEther(await tokenB.balanceOf(user1.address));
-        console.log(`user1 tokenB Amount:  ${user1tokenBAmountBeforeMint} `);
+        console.log(`user1 tokenB Amount:  ${user1tokenBAmountBeforeMint} `);      
+        
 
-        //User1 使用 1 顆 token B 來 mint cToken
+        //User1 使用 1 顆 tokenB 來 mint cTKB ok
         await cTKB.connect(user1).mint(ethers.utils.parseUnits("1", 18));
         let user1tokenBAmountAfterMint = ethers.utils.formatEther(await tokenB.balanceOf(user1.address));
-        console.log(`user1 tokenB Amount:  ${user1tokenBAmountAfterMint} `);
+        console.log(`user1 tokenB Amount after mint 1 CTKB:  ${user1tokenBAmountAfterMint} `);
         let user1CTKBAmount = ethers.utils.formatEther(await cTKB.balanceOf(user1.address));
-        console.log(`user1 CTKB Amount:  ${user1CTKBAmount} `);
+        console.log(`user1 CTKB Amount after mint 1 CTKB:  ${user1CTKBAmount} `);
 
 
-        //預存 100顆 token A到CTKA 
-        await tokenA.connect(owner).approve(cTKA.address, ethers.utils.parseUnits("100", 18));
-        await cTKA.connect(owner).mint(ethers.utils.parseUnits("100", 18));
-        let TKAOfCTKA = ethers.utils.formatEther(await tokenA.balanceOf(cTKA.address));
-        console.log(`TKA in CTKA Amount:  ${TKAOfCTKA}`);
-
-        //User1 使用 token B 作為抵押品來借出 50 顆 token A
+        //User1 使用 tokenB 作為抵押品來借出 50 顆 token A
+        //error: function returned an unexpected amount of data
+        //at Comptroller.borrowAllowed (contracts/Comptroller.sol:372)
         await cTKA.connect(user1).borrow(ethers.utils.parseUnits("50", 18));
-        let user1CTKAAmount = ethers.utils.formatEther(await cTKA.balanceOf(user1.address));
-        console.log(`user1 CTKA Amount:  ${user1CTKAAmount} `);
-
-
-
-
-        //let user1tokenBamoutBeforeMint = ethers.utils.formatEther(await cErc20.balanceOf(user1.address));
-        //console.log(`user1 CTK amount before redeem:  ${user1CtkamoutBeforeRedeem} `);
-
-        //await cTKB.connect(owner).transfer(cErc20V2.address, ethers.utils.parseUnits("100",18));
-
-
+        let user1TKAAmount = ethers.utils.formatEther(await tokenA.balanceOf(user1.address));
+        console.log(`user1 TKA Amount:  ${user1TKAAmount} `);
+        let TKAOfCTKA2 = ethers.utils.formatEther(await tokenA.balanceOf(cTKA.address));
+        console.log(`TKA in CTKA Amount:  ${TKAOfCTKA2}`);     
         
-        //console.log("approved user1 to interact with cErc20V2");
 
 
 
