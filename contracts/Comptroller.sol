@@ -488,30 +488,46 @@ contract Comptroller is ComptrollerV7Storage, ComptrollerInterface, ComptrollerE
         uint repayAmount) override external returns (uint) {
         // Shh - currently unused
         liquidator;
+        // console.log(cTokenBorrowed,cTokenCollateral, liquidator, "BBBBB");
+        // console.log(borrower,repayAmount, "CCCC");
+
 
         if (!markets[cTokenBorrowed].isListed || !markets[cTokenCollateral].isListed) {
+            //console.log(markets[cTokenBorrowed].isListed, markets[cTokenCollateral].isListed, "BBBBB");
+
             return uint(Error.MARKET_NOT_LISTED);
         }
 
         uint borrowBalance = CToken(cTokenBorrowed).borrowBalanceStored(borrower);
+        //console.log(borrowBalance, "borrowBalanceBBBBB");
+
 
         /* allow accounts to be liquidated if the market is deprecated */
         if (isDeprecated(CToken(cTokenBorrowed))) {
+            console.log(cTokenBorrowed, "cTokenBorrowed");
+
             require(borrowBalance >= repayAmount, "Can not repay more than the total borrow");
         } else {
             /* The borrower must have shortfall in order to be liquidatable */
             (Error err, , uint shortfall) = getAccountLiquidityInternal(borrower);
+
             if (err != Error.NO_ERROR) {
                 return uint(err);
             }
 
             if (shortfall == 0) {
+                //console.log(shortfall,"shortfall");
+
                 return uint(Error.INSUFFICIENT_SHORTFALL);
             }
 
             /* The liquidator may not repay more than what is allowed by the closeFactor */
             uint maxClose = mul_ScalarTruncate(Exp({mantissa: closeFactorMantissa}), borrowBalance);
+            //console.log(closeFactorMantissa, borrowBalance,"closeFactorMantissa, borrowBalance");
+
             if (repayAmount > maxClose) {
+                //_setBorrowPausedconsole.log(repayAmount, maxClose,"repayAmount > maxClose");
+
                 return uint(Error.TOO_MUCH_REPAY);
             }
         }
@@ -914,7 +930,7 @@ contract Comptroller is ComptrollerV7Storage, ComptrollerInterface, ComptrollerE
 
         // Emit event with asset, old collateral factor, and new collateral factor
         emit NewCollateralFactor(cToken, oldCollateralFactorMantissa, newCollateralFactorMantissa);
-        console.log(msg.sender ,"JJJJJJJ");
+        //console.log(msg.sender ,"JJJJJJJ");
 
         return uint(Error.NO_ERROR);
     }

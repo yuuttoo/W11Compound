@@ -724,23 +724,35 @@ abstract contract CToken is CTokenInterface, ExponentialNoError, TokenErrorRepor
      */
     function liquidateBorrowFresh(address liquidator, address borrower, uint repayAmount, CTokenInterface cTokenCollateral) internal {
         /* Fail if liquidate not allowed */
+        
         uint allowed = comptroller.liquidateBorrowAllowed(address(this), address(cTokenCollateral), liquidator, borrower, repayAmount);
+        //console.log( allowed, "allowed");
+
         if (allowed != 0) {
+         //console.log(liquidator, borrower, repayAmount, "PPPPPP");
+
             revert LiquidateComptrollerRejection(allowed);
+            
         }
 
         /* Verify market's block number equals current block number */
         if (accrualBlockNumber != getBlockNumber()) {
+            //console.log(accrualBlockNumber, "QQQQ");
+
             revert LiquidateFreshnessCheck();
         }
 
         /* Verify cTokenCollateral market's block number equals current block number */
         if (cTokenCollateral.accrualBlockNumber() != getBlockNumber()) {
+            //console.log(accrualBlockNumber, "RRRR");
+
             revert LiquidateCollateralFreshnessCheck();
         }
 
         /* Fail if borrower = liquidator */
         if (borrower == liquidator) {
+            //console.log(accrualBlockNumber, "ZZZZ");
+
             revert LiquidateLiquidatorIsBorrower();
         }
 
@@ -1152,9 +1164,11 @@ abstract contract CToken is CTokenInterface, ExponentialNoError, TokenErrorRepor
      * @dev Prevents a contract from calling itself, directly or indirectly.
      */
     modifier nonReentrant() {
+        //console.log(_notEntered,  "xxxxxx");
         require(_notEntered, "re-entered");
         _notEntered = false;
         _;
         _notEntered = true; // get a gas-refund post-Istanbul
+        //console.log(_notEntered,  "yyyyy");
     }
 }
