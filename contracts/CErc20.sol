@@ -54,10 +54,10 @@ contract CErc20 is CToken, CErc20Interface {
      */
     function mint(uint mintAmount) override external returns (uint) {
         mintInternal(mintAmount);
-        console.log(
-            "mintAmount:",
-            mintAmount
-        );
+        // console.log(
+        //     "mintAmountAAAA:",
+        //     mintAmount
+        // );
         return NO_ERROR;
     }
 
@@ -173,10 +173,15 @@ contract CErc20 is CToken, CErc20Interface {
      */
     function doTransferIn(address from, uint amount) virtual override internal returns (uint) {
         // Read from storage once
+        //console.log("XXXXX", from, amount);
         address underlying_ = underlying;
         EIP20NonStandardInterface token = EIP20NonStandardInterface(underlying_);
         uint balanceBefore = EIP20Interface(underlying_).balanceOf(address(this));
+        //console.log("YYYYY", underlying_, balanceBefore);
+        //console.log("ZZZZ1", from, address(this), amount);
+
         token.transferFrom(from, address(this), amount);
+        //console.log("ZZZZ2", from, address(this), amount);
 
         bool success;
         assembly {
@@ -192,8 +197,9 @@ contract CErc20 is CToken, CErc20Interface {
                     revert(0, 0)
                 }
         }
-        require(success, "TOKEN_TRANSFER_IN_FAILED");
 
+        require(success, "TOKEN_TRANSFER_IN_FAILED");
+        
         // Calculate the amount that was *actually* transferred
         uint balanceAfter = EIP20Interface(underlying_).balanceOf(address(this));
         return balanceAfter - balanceBefore;   // underflow already checked above, just subtract

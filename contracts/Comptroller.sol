@@ -357,7 +357,6 @@ contract Comptroller is ComptrollerV7Storage, ComptrollerInterface, ComptrollerE
             //console.log(cToken, borrower, borrowAmount,"RRRRR");
             require(msg.sender == cToken, "sender must be cToken");
     
-
             // attempt to add borrower to the market
             Error err = addToMarketInternal(CToken(msg.sender), borrower);
             if (err != Error.NO_ERROR) {
@@ -372,7 +371,7 @@ contract Comptroller is ComptrollerV7Storage, ComptrollerInterface, ComptrollerE
         if (oracle.getUnderlyingPrice(CToken(cToken)) == 0) {
             return uint(Error.PRICE_ERROR);
         }
-
+        //console.log(cToken, borrower, borrowAmount,"ZZZZZ");
 
         uint borrowCap = borrowCaps[cToken];
         // Borrow cap of 0 corresponds to unlimited borrowing
@@ -381,14 +380,20 @@ contract Comptroller is ComptrollerV7Storage, ComptrollerInterface, ComptrollerE
             uint nextTotalBorrows = add_(totalBorrows, borrowAmount);
             require(nextTotalBorrows < borrowCap, "market borrow cap reached");
         }
+        //console.log(cToken, borrower, borrowAmount,"TTTTT");
+
 
         (Error err, , uint shortfall) = getHypotheticalAccountLiquidityInternal(borrower, CToken(cToken), 0, borrowAmount);
         if (err != Error.NO_ERROR) {
             return uint(err);
         }
+        //console.log(cToken, borrower, borrowAmount,"VVVVVV");
+
         if (shortfall > 0) {
             return uint(Error.INSUFFICIENT_LIQUIDITY);
         }
+        //console.log(cToken, borrower, borrowAmount,"KKKKK");
+
 
         // Keep the flywheel moving
         Exp memory borrowIndex = Exp({mantissa: CToken(cToken).borrowIndex()});

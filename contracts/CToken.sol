@@ -131,6 +131,7 @@ abstract contract CToken is CTokenInterface, ExponentialNoError, TokenErrorRepor
      * @return Whether or not the transfer succeeded
      */
     function transferFrom(address src, address dst, uint256 amount) override external nonReentrant returns (bool) {
+        console.log("MMMMMM", src, dst, amount);
         return transferTokens(msg.sender, src, dst, amount) == NO_ERROR;
     }
 
@@ -569,6 +570,7 @@ abstract contract CToken is CTokenInterface, ExponentialNoError, TokenErrorRepor
     function borrowFresh(address payable borrower, uint borrowAmount) internal {
         /* Fail if borrow not allowed */
         uint allowed = comptroller.borrowAllowed(address(this), borrower, borrowAmount);
+        //console.log("AAAA", borrower, borrowAmount);
         if (allowed != 0) {
             revert BorrowComptrollerRejection(allowed);
         }
