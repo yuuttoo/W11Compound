@@ -4,7 +4,6 @@ require("@nomicfoundation/hardhat-toolbox");
 
 const ALCHEMY_API_KEY = YOUR_ALCHEMY_API_KEY;
 
-const PRIVATE_KEY =  YOUR_PRIVATE_KEY;
 
 
 module.exports = {
