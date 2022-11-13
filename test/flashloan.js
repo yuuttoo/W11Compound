@@ -126,7 +126,7 @@ describe("AAVE flashloan liquidation", function() {
         console.log(`UNI, USDC entered Markets`);
         let user1Assets = await comptroller.connect(user1).getAssetsIn(user1.address);
         console.log(`user1 getAssetsIn: ${user1Assets}`);
-
+            //ef140bd95a3043339fecb4c2ea1a4a7361286096
 
         //設定UNI collateral factor 為 50%
         //newCollateralFactorMantissa The new collateral factor, scaled by 1e18
