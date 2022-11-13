@@ -14,6 +14,8 @@ describe("AAVE flashloan liquidation", function() {
         const usdcAddress = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';  
         const uniAddress = '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984';
         const binanceHotWalletAddress = '0xF977814e90dA44bFA03b6295A0616a897441aceC';
+        const LENDING_POOL_PROVIDER_ADDRESS = "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5";
+        const SWAP_ROUTER_ADDRESS = "0xE592427A0AEce92De3Edee1F18E0157C05861564";
         let usdc;
         let uni;
 
@@ -139,18 +141,18 @@ describe("AAVE flashloan liquidation", function() {
 
         //deploy flash loan contract
         const flashLoanFactory = await ethers.getContractFactory("FlashLoan");
-        const flashloan = await flashLoanFactory.deploy();
-        await flashloan.deployed();
-        console.log(`flash loan contract deplaoyed to ${flashloan.address}`);
+        const aaveFL = await flashLoanFactory.deploy(LENDING_POOL_PROVIDER_ADDRESS, SWAP_ROUTER_ADDRESS);
+        await aaveFL.deployed();
+        console.log(`flash loan contract deplaoyed to ${aaveFL.address}`);
 
         
-        return {  owner, user1, user2, usdcAddress, uniAddress, binanceWallet, uni, usdc, cUSDC, cUNI, comptroller, priceOracle, flashloan };
+        return {  owner, user1, user2, usdcAddress, uniAddress, binanceWallet, uni, usdc, cUSDC, cUNI, comptroller, priceOracle, aaveFL };
         
     }
 
     //W13 Q6
     it("User1 Should be liquidated by AAVE Flash loan", async function() {
-        const { owner, user1, user2, usdcAddress, uniAddress, binanceWallet, uni, usdc, cUSDC, cUNI, priceOracle, flashloan } = await loadFixture(deployFixture);
+        const { owner, user1, user2, usdcAddress, uniAddress, binanceWallet, uni, usdc, cUSDC, cUNI, priceOracle, aaveFL } = await loadFixture(deployFixture);
         
         //approve cUNI using user1's UNI or get reverted with reason string 're-entered'
         await uni.connect(user1).approve(cUNI.address, ethers.utils.parseUnits("1000",18));
@@ -194,8 +196,10 @@ describe("AAVE flashloan liquidation", function() {
 
         //讓 User2 透過 AAVE 的 Flash loan 來清算 User1
         //原本1000顆UNI $10 可借5000 (10000 * 0.5(collatoral_factor)), 跌到6.2 只可借3100 因此可清算user1
-        
-        
+        //幫忙還一半的usdc
+        //0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5
+
+        await aaveFL.flashloan(usdcAddress, ethers.utils.parseUnits("2500", 6));
 
         
         
