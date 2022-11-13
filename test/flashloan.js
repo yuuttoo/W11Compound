@@ -152,7 +152,7 @@ describe("AAVE flashloan liquidation", function() {
 
     //W13 Q6
     it("User1 Should be liquidated by AAVE Flash loan", async function() {
-        const { owner, user1, user2, usdcAddress, uniAddress, binanceWallet, uni, usdc, cUSDC, cUNI, priceOracle, aaveFL } = await loadFixture(deployFixture);
+        const { owner, user1, user2, usdcAddress, uniAddress, binanceWallet, uni, usdc, cUSDC, cUNI, comptroller, priceOracle, aaveFL } = await loadFixture(deployFixture);
         
         //approve cUNI using user1's UNI or get reverted with reason string 're-entered'
         await uni.connect(user1).approve(cUNI.address, ethers.utils.parseUnits("1000",18));
@@ -179,6 +179,8 @@ describe("AAVE flashloan liquidation", function() {
         let UNIOfcUNI = ethers.utils.formatEther(await uni.balanceOf(cUNI.address));
         console.log(`UNI of cUNI Amount:  ${UNIOfcUNI}`);  
 
+
+
         
         //User1 使用 UNI 作為抵押品借出 5000 顆 USDC (decimal 6)
         await cUSDC.connect(user1).borrow(ethers.utils.parseUnits("5000", 6));
@@ -187,6 +189,9 @@ describe("AAVE flashloan liquidation", function() {
         let USDCOfcUSDC = await usdc.balanceOf(cUSDC.address);
         console.log(`USDC in cUSDC Amount:  ${USDCOfcUSDC}`);  
 
+        let user1Liquidity = await comptroller.getAccountLiquidity(user1.address);
+        console.log(`user1 Liquidity before price dumping: ${user1Liquidity}`);
+
         //將 UNI 價格改為 $6.2 使 User1 產生 Shortfall
         await priceOracle.setUnderlyingPrice(cUNI.address, ethers.utils.parseUnits("6.2", 18))
         let uniPrice = await priceOracle.connect(owner).getUnderlyingPrice(cUNI.address);
@@ -194,16 +199,22 @@ describe("AAVE flashloan liquidation", function() {
         console.log(`UNI price: ${formattingUniPrice}`);
 
 
+
+        let user1LiquidityAfter = await comptroller.getAccountLiquidity(user1.address);
+
+        console.log(`user1 Liquidity after price dumping: ${user1LiquidityAfter}`);
+
+
         //讓 User2 透過 AAVE 的 Flash loan 來清算 User1
         //原本1000顆UNI $10 可借5000 (10000 * 0.5(collatoral_factor)), 跌到6.2 只可借3100 因此可清算user1
-        //幫忙還一半的usdc
-        //0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5
+        //幫忙還一半的usdc 2500顆
 
-        await aaveFL.flashloan(usdcAddress, ethers.utils.parseUnits("2500", 6));
+        await aaveFL.connect(user2).flashloan(usdcAddress, ethers.utils.parseUnits("2500", 6), user1.address, cUSDC.address, cUNI.address);
+        //console.log("")
 
-        
-        
         //可以自行檢查清算 50% 後是不是大約可以賺 121 USD
+        let user2USDC = ethers.utils.formatEther(await usdc.balanceOf(user2.address));
+        console.log(`user2 USDC Amount After mint:  ${user2USDC} `);
     })
 
 })

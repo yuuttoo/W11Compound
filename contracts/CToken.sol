@@ -726,34 +726,36 @@ abstract contract CToken is CTokenInterface, ExponentialNoError, TokenErrorRepor
      */
     function liquidateBorrowFresh(address liquidator, address borrower, uint repayAmount, CTokenInterface cTokenCollateral) internal {
         /* Fail if liquidate not allowed */
+        //console.log( address(this), address(cTokenCollateral) , "allowed1");//cUSDC/cUNI
+        console.log(liquidator, borrower, "PPPPPP");
         
         uint allowed = comptroller.liquidateBorrowAllowed(address(this), address(cTokenCollateral), liquidator, borrower, repayAmount);
-        //console.log( allowed, "allowed");
+        //console.log(repayAmount, cTokenCollateral, "QQQQQ");
 
         if (allowed != 0) {
-         //console.log(liquidator, borrower, repayAmount, "PPPPPP");
+         console.log(liquidator, borrower, repayAmount, "QQQQ");
 
             revert LiquidateComptrollerRejection(allowed);
-            
+             console.log(liquidator, borrower, repayAmount, "PPPPPP2");
         }
 
         /* Verify market's block number equals current block number */
         if (accrualBlockNumber != getBlockNumber()) {
-            //console.log(accrualBlockNumber, "QQQQ");
+            console.log(accrualBlockNumber, "QQQQ");
 
             revert LiquidateFreshnessCheck();
         }
 
         /* Verify cTokenCollateral market's block number equals current block number */
         if (cTokenCollateral.accrualBlockNumber() != getBlockNumber()) {
-            //console.log(accrualBlockNumber, "RRRR");
+            console.log(accrualBlockNumber, "RRRR");
 
             revert LiquidateCollateralFreshnessCheck();
         }
 
         /* Fail if borrower = liquidator */
         if (borrower == liquidator) {
-            //console.log(accrualBlockNumber, "ZZZZ");
+            console.log(accrualBlockNumber, "ZZZZ");
 
             revert LiquidateLiquidatorIsBorrower();
         }
