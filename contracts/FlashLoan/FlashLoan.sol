@@ -94,15 +94,17 @@ contract FlashLoan is FlashLoanReceiverBase {
 
     //以貸款償還清算user1的欠款
     CErc20(cUSDC).liquidateBorrow(user1, amounts[0], CErc20(cUNI));//reward為抵押品UNI, cUNI作為債權
-    console.log("check liquidateBorrow", assets[0], address(cUSDC));
+    //console.log("check liquidateBorrow", assets[0], address(cUSDC));
 
     //從rewardAddress 贖回 UNI 
     {
-        //cUNI.redeem(cUNI.balanceOf(address(this)));
+        CErc20(cUNI).redeem(CErc20(cUNI).balanceOf(address(this)));
+        //console.log("check redeem", IERC20(UNI).balanceOf(address(this)));
+
     }
     
     uint256 uniAmount = IERC20(UNI).balanceOf(address(this));//本合約UNI餘額
-    emit Log( "uniAmount: " ,uniAmount);
+    //console.log( "uniAmount: " ,uniAmount);
 
     {
 
@@ -123,15 +125,11 @@ contract FlashLoan is FlashLoanReceiverBase {
     });
     uint256 amountOut = swapRouter.exactInputSingle(swapParams);
 
-    emit Log("amountOut", amountOut);
+    //console.log("amountOut", amountOut);
     }
-    //approve aave access 
-
-
-
 
     {
-    //還aave
+    // repay Aave
     for (uint i = 0; i < assets.length; i++) {
       emit Log("borrowed", amounts[i]);
       emit Log("fee", premiums[i]);
@@ -140,7 +138,7 @@ contract FlashLoan is FlashLoanReceiverBase {
       IERC20(assets[i]).approve(address(LENDING_POOL), amountOwing);//approve aave取款
     }
      }
-    // repay Aave
+   
     return true;
   }
 }

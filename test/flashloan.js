@@ -109,8 +109,8 @@ describe("AAVE flashloan liquidation", function() {
         console.log ("cUNI added to comptroller market list");
 
 
-        //Oracle設定 cUSDC 價格 $1
-        await priceOracle.connect(owner).setUnderlyingPrice(cUSDC.address, ethers.utils.parseUnits("1",18));
+        //Oracle設定 cUSDC 價格 $1 //因為USDC decimal為6，這裡decimal要加12位數 為30
+        await priceOracle.connect(owner).setUnderlyingPrice(cUSDC.address, ethers.utils.parseUnits("1",30));//
         let cUSDCPrice = await priceOracle.connect(owner).getUnderlyingPrice(cUSDC.address);
         let formattingcUSDCPrice = ethers.utils.formatEther(cUSDCPrice);
         console.log(`cUSDC price: ${formattingcUSDCPrice}`);
@@ -199,7 +199,6 @@ describe("AAVE flashloan liquidation", function() {
         console.log(`UNI price: ${formattingUniPrice}`);
 
 
-
         let user1LiquidityAfter = await comptroller.getAccountLiquidity(user1.address);
 
         console.log(`user1 Liquidity after price dumping: ${user1LiquidityAfter}`);
@@ -212,9 +211,9 @@ describe("AAVE flashloan liquidation", function() {
         await aaveFL.connect(user2).flashloan(usdcAddress, ethers.utils.parseUnits("2500", 6), user1.address, cUSDC.address, cUNI.address);
         //console.log("")
 
-        //可以自行檢查清算 50% 後是不是大約可以賺 121 USD
-        let user2USDC = ethers.utils.formatEther(await usdc.balanceOf(user2.address));
-        console.log(`user2 USDC Amount After mint:  ${user2USDC} `);
+        //可以自行檢查清算 50% 後是不是大約可以賺 121 USD //目前是賺 170USD
+        let aaveFLUSDC = ethers.utils.formatUnits(await usdc.balanceOf(aaveFL.address), 6);
+        console.log(`USDC Amount After liquidating user1:  ${aaveFLUSDC} `);
     })
 
 })
