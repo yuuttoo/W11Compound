@@ -2,7 +2,7 @@ require("@nomicfoundation/hardhat-toolbox");
 
 /** @type import('hardhat/config').HardhatUserConfig */
 
-const ALCHEMY_API_KEY = YOUR_ALCHEMY_API_KEY;
+const ALCHEMY_API_KEY = "ZzkGWXR1gIYdfX2BpJC0KCrKQAC34TyO";
 
 
 
@@ -17,7 +17,7 @@ module.exports = {
             runs: 1
           }
         }
-      }
+      },
     ],
   },
   networks: {

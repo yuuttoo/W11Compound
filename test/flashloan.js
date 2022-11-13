@@ -136,14 +136,21 @@ describe("AAVE flashloan liquidation", function() {
 
         //set Liquidation incentive to 10% (1.1)
         await comptroller._setLiquidationIncentive(ethers.utils.parseUnits("1.1", 18));
+
+        //deploy flash loan contract
+        const flashLoanFactory = await ethers.getContractFactory("FlashLoan");
+        const flashloan = await flashLoanFactory.deploy();
+        await flashloan.deployed();
+        console.log(`flash loan contract deplaoyed to ${flashloan.address}`);
+
         
-        return {  owner, user1, user2, usdcAddress, uniAddress, binanceWallet, uni, usdc, cUSDC, cUNI, comptroller, priceOracle };
+        return {  owner, user1, user2, usdcAddress, uniAddress, binanceWallet, uni, usdc, cUSDC, cUNI, comptroller, priceOracle, flashloan };
         
     }
 
     //W13 Q6
     it("User1 Should be liquidated by AAVE Flash loan", async function() {
-        const { owner, user1, user2, usdcAddress, uniAddress, binanceWallet, uni, usdc, cUSDC, cUNI, comptroller, priceOracle } = await loadFixture(deployFixture);
+        const { owner, user1, user2, usdcAddress, uniAddress, binanceWallet, uni, usdc, cUSDC, cUNI, priceOracle, flashloan } = await loadFixture(deployFixture);
         
         //approve cUNI using user1's UNI or get reverted with reason string 're-entered'
         await uni.connect(user1).approve(cUNI.address, ethers.utils.parseUnits("1000",18));
