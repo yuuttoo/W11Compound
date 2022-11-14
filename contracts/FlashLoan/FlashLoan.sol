@@ -131,8 +131,9 @@ contract FlashLoan is FlashLoanReceiverBase {
     {
     // repay Aave
     for (uint i = 0; i < assets.length; i++) {
-      emit Log("borrowed", amounts[i]);
-      emit Log("fee", premiums[i]);
+      console.log("borrowed", amounts[i]);
+      console.log("fee", premiums[i]);
+
 
       uint amountOwing = amounts[i].add(premiums[i]);//總欠款為借款 + 利息
       IERC20(assets[i]).approve(address(LENDING_POOL), amountOwing);//approve aave取款

@@ -73,10 +73,10 @@ describe("AAVE flashloan liquidation", function() {
             usdcAddress,
             comptroller.address,
             interestRateModel.address,
-            ethers.utils.parseUnits("1", 18),//1:1
+            ethers.utils.parseUnits("1", 6),//1:1 USDC decimal = 6
             "cUSDC",
             "cUSDC",
-            18
+            6
         );
 
 
@@ -203,8 +203,10 @@ describe("AAVE flashloan liquidation", function() {
         //原本1000顆UNI $10 可借5000 (10000 * 0.5(collatoral_factor)), 跌到6.2 只可借3100 因此可清算user1
         //幫忙還一半的usdc 2500顆
         await aaveFL.connect(user2).flashloan(usdcAddress, ethers.utils.parseUnits("2500", 6), user1.address, cUSDC.address, cUNI.address);
+        let USDCOfcUSDC2 = await usdc.balanceOf(cUSDC.address);
+        console.log(`USDC in cUSDC Amount:  ${USDCOfcUSDC2}`);  
 
-        //可以自行檢查清算 50% 後是不是大約可以賺 121 USD //目前是賺 170USD
+        // //可以自行檢查清算 50% 後是不是大約可以賺 121 USD 
         let aaveFLUSDC = ethers.utils.formatUnits(await usdc.balanceOf(aaveFL.address), 6);
         console.log(`USDC Amount After liquidating user1:  ${aaveFLUSDC} `);
     })
