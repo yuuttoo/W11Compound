@@ -76,7 +76,7 @@ describe("AAVE flashloan liquidation", function() {
             ethers.utils.parseUnits("1", 6),//1:1 USDC decimal = 6
             "cUSDC",
             "cUSDC",
-            6
+            18
         );
 
 
