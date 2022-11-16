@@ -137,7 +137,7 @@ describe("AAVE flashloan liquidation", function() {
         await comptroller._setCloseFactor(ethers.utils.parseUnits("0.5", 18));
 
         //set Liquidation incentive to 10% (1.1)
-        await comptroller._setLiquidationIncentive(ethers.utils.parseUnits("1.1", 18));
+        await comptroller._setLiquidationIncentive(ethers.utils.parseUnits("1.08", 18));//1.1
 
         //deploy flash loan contract
         const flashLoanFactory = await ethers.getContractFactory("FlashLoan");
